@@ -1,0 +1,125 @@
+// This is the Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  campaigns Campaign[]
+  
+  @@map("users")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      CampaignStatus @default(DRAFT)
+  budget      Float
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  metrics     CampaignMetric[]
+  insights    CampaignInsight[]
+  
+  @@map("campaigns")
+}
+
+model CampaignMetric {
+  id          String   @id @default(cuid())
+  timestamp   DateTime @default(now())
+  
+  // Performance metrics
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  spend       Float    @default(0)
+  revenue     Float    @default(0)
+  
+  // Calculated metrics (can be computed)
+  ctr         Float?   // Click-through rate
+  cpc         Float?   // Cost per click
+  cpa         Float?   // Cost per acquisition
+  roi         Float?   // Return on investment
+  roas        Float?   // Return on ad spend
+  
+  // Metadata
+  source      String?  // Data source (e.g., "facebook", "google", "manual")
+  platform    String?  // Platform identifier
+  
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("campaign_metrics")
+}
+
+model CampaignInsight {
+  id          String   @id @default(cuid())
+  type        InsightType
+  severity    Severity @default(INFO)
+  title       String
+  description String
+  
+  // Insight data
+  currentValue  Float?
+  thresholdValue Float?
+  recommendation String?
+  actionItems    String[] // Array of suggested actions
+  
+  // Metadata
+  detectedAt    DateTime @default(now())
+  resolvedAt    DateTime?
+  isResolved    Boolean  @default(false)
+  
+  campaignId    String
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("campaign_insights")
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum InsightType {
+  LOW_CTR
+  HIGH_CPA
+  LOW_ROI
+  LOW_ROAS
+  BUDGET_ALERT
+  PERFORMANCE_DROP
+  ANOMALY_DETECTED
+}
+
+enum Severity {
+  INFO
+  WARNING
+  CRITICAL
+}

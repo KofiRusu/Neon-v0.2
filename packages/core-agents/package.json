@@ -1,0 +1,28 @@
+{
+  "name": "@neon/core-agents",
+  "version": "0.1.0",
+  "description": "Core AI agents for campaign optimization and monitoring",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "example": "ts-node src/example.ts"
+  },
+  "dependencies": {
+    "@neon/data-model": "workspace:*",
+    "@neon/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}
