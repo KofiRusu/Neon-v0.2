@@ -1,0 +1,38 @@
+{
+  "name": "@neon/core-agents",
+  "version": "0.1.0",
+  "description": "Core agents for lead generation, outreach, and automation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "example": "ts-node src/examples/outreach-example.ts",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@neon/types": "workspace:*",
+    "@neon/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "outreach",
+    "lead-generation",
+    "email-automation",
+    "linkedin-scraping",
+    "sales-automation"
+  ],
+  "author": "Neon Team",
+  "license": "MIT"
+}
