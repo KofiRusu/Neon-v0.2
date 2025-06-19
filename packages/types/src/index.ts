@@ -53,4 +53,47 @@ export interface Logger {
   warn(message: string, meta?: Record<string, unknown>): void;
   error(message: string, meta?: Record<string, unknown>): void;
   debug(message: string, meta?: Record<string, unknown>): void;
+}
+
+// AuditAgent specific types
+export interface QualityScore {
+  relevance: number;
+  clarity: number;
+  grammar: number;
+  engagement: number;
+  overall: number;
+}
+
+export interface EvaluationCriteria {
+  relevance: {
+    weight: number;
+    description: string;
+  };
+  clarity: {
+    weight: number;
+    description: string;
+  };
+  grammar: {
+    weight: number;
+    description: string;
+  };
+  engagement: {
+    weight: number;
+    description: string;
+  };
+}
+
+export interface HallucinationCheck {
+  isHallucination: boolean;
+  confidence: number;
+  reasons: string[];
+}
+
+export interface AgentPerformanceMetrics {
+  agent: string;
+  totalEvaluations: number;
+  averageScore: number;
+  hallucinationRate: number;
+  lastEvaluated: Date;
+  scoreTrend: number[]; // Last 10 scores
 } 

@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AIEventLog {
+  id        String   @id @default(cuid())
+  agent     String
+  event     String
+  timestamp DateTime @default(now())
+  metadata  Json     @default("{}")
+  success   Boolean  @default(true)
+  error     String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ai_event_log")
+}
+
+model QualityScore {
+  id               String   @id @default(cuid())
+  agent            String
+  outputId         String?
+  relevanceScore   Float
+  clarityScore     Float
+  grammarScore     Float
+  engagementScore  Float
+  overallScore     Float
+  hallucinationDetected Boolean @default(false)
+  metadata         Json     @default("{}")
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("quality_scores")
+  @@index([agent])
+  @@index([createdAt])
+}
+
+model AgentPerformance {
+  id                String   @id @default(cuid())
+  agent             String   @unique
+  totalOutputs      Int      @default(0)
+  averageScore      Float    @default(0.0)
+  hallucinationRate Float    @default(0.0)
+  lastEvaluated     DateTime?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("agent_performance")
+}

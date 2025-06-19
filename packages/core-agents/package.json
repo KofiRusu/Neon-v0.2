@@ -1,0 +1,25 @@
+{
+  "name": "@neon/core-agents",
+  "version": "0.1.0",
+  "description": "Core AI agents for Neon v0.2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@neon/types": "workspace:*",
+    "@neon/utils": "workspace:*",
+    "@neon/data-model": "workspace:*",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
