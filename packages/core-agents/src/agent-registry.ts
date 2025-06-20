@@ -7,6 +7,7 @@ import { OutreachAgent } from './agents/outreach-agent';
 import { TrendAgent } from './agents/trend-agent';
 import { InsightAgent } from './agents/insight-agent';
 import { DesignAgent } from './agents/design-agent';
+import { ARAgent } from './agents/ar-agent';
 
 /**
  * Register all available agents with the AgentFactory
@@ -20,6 +21,7 @@ export function registerAllAgents(): void {
   AgentFactory.registerAgent('trend', TrendAgent);
   AgentFactory.registerAgent('insight', InsightAgent);
   AgentFactory.registerAgent('design', DesignAgent);
+  AgentFactory.registerAgent('ar', ARAgent);
   
   console.log('Agent registry initialized');
   console.log('Available agent types:', AgentFactory.getAvailableTypes());
