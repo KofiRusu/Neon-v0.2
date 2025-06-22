@@ -27,6 +27,7 @@ model User {
   analytics     Analytics[]
   sessions      Session[]
   accounts      Account[]
+  emailCampaigns EmailCampaign[]
 
   @@map("users")
 }
@@ -95,6 +96,7 @@ model Campaign {
   agentExecutions AgentExecution[]
   analytics   Analytics[]
   abTests     ABTest[]
+  emailCampaigns EmailCampaign[]
 
   @@map("campaigns")
 }
@@ -352,4 +354,104 @@ enum LeadStatus {
   QUALIFIED
   CONVERTED
   LOST
+}
+
+// Email Marketing Models
+model EmailCampaign {
+  id              String            @id @default(cuid())
+  name            String
+  subject         String
+  content         String            @db.Text
+  templateId      String?
+  variables       Json?             // For personalization variables
+  audience        Json?             // Target audience criteria
+  scheduledAt     DateTime?
+  status          EmailCampaignStatus @default(DRAFT)
+  priority        Int               @default(5)
+  
+  // Tracking
+  totalSent       Int               @default(0)
+  totalDelivered  Int               @default(0)
+  totalOpened     Int               @default(0)
+  totalClicked    Int               @default(0)
+  totalBounced    Int               @default(0)
+  totalUnsubscribed Int             @default(0)
+  
+  // Relations
+  campaignId      String?
+  userId          String
+  
+  campaign        Campaign?         @relation(fields: [campaignId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
+  sendLogs        EmailSendLog[]
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  @@map("email_campaigns")
+}
+
+model EmailSendLog {
+  id                String          @id @default(cuid())
+  emailCampaignId   String
+  recipientEmail    String
+  recipientName     String?
+  personalizedContent String?       @db.Text
+  
+  // Email service details
+  externalId        String?         // SendGrid/Mailgun message ID
+  provider          EmailProvider   @default(SENDGRID)
+  
+  // Status tracking
+  status            EmailSendStatus @default(PENDING)
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  openedAt          DateTime?
+  clickedAt         DateTime?
+  bouncedAt         DateTime?
+  unsubscribedAt    DateTime?
+  
+  // Error handling
+  error             String?
+  retryCount        Int             @default(0)
+  maxRetries        Int             @default(3)
+  
+  // Metadata
+  metadata          Json?
+  
+  // Relations
+  emailCampaign     EmailCampaign   @relation(fields: [emailCampaignId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  @@map("email_send_logs")
+}
+
+enum EmailCampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  PAUSED
+  CANCELLED
+  COMPLETED
+}
+
+enum EmailSendStatus {
+  PENDING
+  QUEUED
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  FAILED
+  UNSUBSCRIBED
+}
+
+enum EmailProvider {
+  SENDGRID
+  MAILGUN
+  SMTP
 } 

@@ -15,7 +15,8 @@ import {
   BellIcon,
   MagnifyingGlassIcon,
   PlusIcon,
-  FunnelIcon
+  FunnelIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
 
 export default function Dashboard() {
@@ -123,6 +124,13 @@ export default function Dashboard() {
               <MegaphoneIcon className="h-5 w-5 mr-3" />
               Campaigns
             </button>
+            <a
+              href="/emails"
+              className="nav-item w-full flex items-center"
+            >
+              <EnvelopeIcon className="h-5 w-5 mr-3" />
+              Email Marketing
+            </a>
             <button
               onClick={() => setActiveTab('analytics')}
               className={`nav-item w-full ${activeTab === 'analytics' ? 'active' : ''}`}

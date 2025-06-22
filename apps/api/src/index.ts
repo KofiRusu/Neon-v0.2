@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
+import * as trpcExpress from '@trpc/server/adapters/express';
+import { appRouter } from './router';
+import { Context } from './trpc';
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +21,38 @@ app.use(cors({
 }));
 app.use(compression());
 app.use(express.json());
+
+// Create tRPC context
+const createContext = ({ req, res }: trpcExpress.CreateExpressContextOptions): Context => {
+  // In a real app, you would extract user info from JWT token or session
+  // For now, we'll use a mock user for authenticated routes
+  const authHeader = req.headers.authorization;
+  
+  if (authHeader?.startsWith('Bearer ')) {
+    // Mock user extraction from token
+    return {
+      user: {
+        id: 'user_123',
+        email: 'demo@neonhub.ai',
+        role: 'USER',
+      },
+    };
+  }
+  
+  return {}; // No user for public routes
+};
+
+// Add tRPC endpoint
+app.use(
+  '/api/trpc',
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+    onError: ({ error, path }) => {
+      console.error(`❌ tRPC failed on ${path}:`, error);
+    },
+  })
+);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
