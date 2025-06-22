@@ -23,11 +23,15 @@ model User {
 
   // Relations
   campaigns     Campaign[]
+  campaigns2    Campaign[] @relation("CampaignUser2")
   agentExecutions AgentExecution[]
   analytics     Analytics[]
   sessions      Session[]
   accounts      Account[]
 
+  // Performance indexes
+  @@index([role, createdAt])
+  @@index([emailVerified])
   @@map("users")
 }
 
@@ -96,6 +100,13 @@ model Campaign {
   analytics   Analytics[]
   abTests     ABTest[]
 
+  // High-performance indexes for common queries
+  @@index([userId, status, createdAt])     // User's campaigns by status and date
+  @@index([status, type])                  // Campaign dashboard filtering
+  @@index([startDate, endDate])            // Date range queries
+  @@index([type, createdAt])               // Campaign type analytics
+  @@index([budget])                        // Budget-based queries
+  @@index([updatedAt])                     // Recently modified campaigns
   @@map("campaigns")
 }
 
@@ -137,6 +148,14 @@ model AgentExecution {
   campaign    Campaign? @relation(fields: [campaignId], references: [id])
   user        User?    @relation(fields: [userId], references: [id])
 
+  // Critical indexes for AI performance monitoring
+  @@index([agentId, status, startedAt])    // Agent performance tracking
+  @@index([campaignId, status])            // Campaign execution status
+  @@index([userId, startedAt])             // User execution history
+  @@index([status, startedAt])             // Execution queue monitoring
+  @@index([performance])                   // Performance-based queries
+  @@index([task, agentId])                 // Task-specific agent performance
+  @@index([completedAt])                   // Completion time analytics
   @@map("agent_executions")
 }
 
@@ -155,6 +174,11 @@ model Analytics {
   campaign    Campaign? @relation(fields: [campaignId], references: [id])
   user        User?    @relation(fields: [userId], references: [id])
 
+  // Analytics dashboard optimization indexes
+  @@index([campaignId, type, date])        // Campaign analytics by type and date
+  @@index([userId, type, date])            // User analytics by type and date
+  @@index([type, period, date])            // Analytics aggregation queries
+  @@index([date])                          // Time-series queries
   @@map("analytics")
 }
 
@@ -192,6 +216,10 @@ model Content {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Content management indexes
+  @@index([platform, status, createdAt])   // Platform content by status
+  @@index([type, status])                  // Content type filtering
+  @@index([status, updatedAt])             // Recently updated content
   @@map("contents")
 }
 
@@ -211,6 +239,12 @@ model Lead {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Lead management and CRM indexes
+  @@index([email])                         // Fast email lookup
+  @@index([status, score])                 // Lead scoring and pipeline
+  @@index([source, createdAt])             // Lead source analytics
+  @@index([score])                         // High-value lead queries
+  @@index([createdAt])                     // Lead timeline
   @@map("leads")
 }
 
@@ -226,6 +260,13 @@ model Trend {
   data        Json
   detectedAt  DateTime @default(now())
 
+  // AI trend analysis optimization indexes
+  @@index([platform, score, detectedAt])   // Top trends by platform
+  @@index([keyword, platform])             // Keyword trend tracking
+  @@index([score, volume])                 // High-impact trend discovery
+  @@index([category, score])               // Category trend analysis
+  @@index([growth])                        // Trending growth analysis
+  @@index([detectedAt])                    // Time-based trend queries
   @@map("trends")
 }
 
