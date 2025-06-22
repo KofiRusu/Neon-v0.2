@@ -8,6 +8,7 @@ export * from './agents/outreach-agent';
 export * from './agents/trend-agent';
 export * from './agents/insight-agent';
 export * from './agents/design-agent';
+export * from './agents/support-agent';
 
 // Agent Manager and Factory
 export { AgentManager, AgentFactory } from './base-agent';

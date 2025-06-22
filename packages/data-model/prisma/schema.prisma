@@ -27,6 +27,13 @@ model User {
   analytics     Analytics[]
   sessions      Session[]
   accounts      Account[]
+  
+  // Support Relations
+  supportThreadsAsCustomer    SupportThread[]       @relation("CustomerSupport")
+  supportThreadsAsAgent       SupportThread[]       @relation("AssignedSupportAgent")
+  messagesSent                MessageLog[]          @relation("MessageSender")
+  escalationsRequested        EscalationRequest[]   @relation("EscalationRequester")
+  escalationsAssigned         EscalationRequest[]   @relation("EscalationAssignee")
 
   @@map("users")
 }
@@ -293,6 +300,7 @@ enum AgentType {
   TREND
   INSIGHT
   DESIGN
+  SUPPORT
 }
 
 enum AgentStatus {
@@ -352,4 +360,137 @@ enum LeadStatus {
   QUALIFIED
   CONVERTED
   LOST
+}
+
+// Support System
+model SupportThread {
+  id              String              @id @default(cuid())
+  customerId      String?
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+  subject         String
+  status          SupportStatus       @default(OPEN)
+  priority        SupportPriority     @default(MEDIUM)
+  category        String?
+  channel         SupportChannel
+  isAiAssisted    Boolean             @default(true)
+  assignedAgentId String?
+  tags            String[]
+  metadata        Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  closedAt        DateTime?
+
+  // Relations
+  messages        MessageLog[]
+  escalations     EscalationRequest[]
+  customer        User?               @relation("CustomerSupport", fields: [customerId], references: [id])
+  assignedAgent   User?               @relation("AssignedSupportAgent", fields: [assignedAgentId], references: [id])
+
+  @@map("support_threads")
+}
+
+model MessageLog {
+  id            String        @id @default(cuid())
+  threadId      String
+  senderId      String?
+  senderType    SenderType
+  senderName    String?
+  content       String
+  messageType   MessageType   @default(TEXT)
+  attachments   Json?
+  aiGenerated   Boolean       @default(false)
+  aiConfidence  Float?
+  isInternal    Boolean       @default(false)
+  readAt        DateTime?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+
+  // Relations
+  thread        SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender        User?         @relation("MessageSender", fields: [senderId], references: [id])
+
+  @@map("message_logs")
+}
+
+model EscalationRequest {
+  id            String            @id @default(cuid())
+  threadId      String
+  reason        EscalationReason
+  description   String?
+  requestedBy   String?
+  assignedTo    String?
+  status        EscalationStatus  @default(PENDING)
+  priority      SupportPriority   @default(HIGH)
+  resolvedAt    DateTime?
+  resolution    String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Relations
+  thread        SupportThread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  requester     User?             @relation("EscalationRequester", fields: [requestedBy], references: [id])
+  assignee      User?             @relation("EscalationAssignee", fields: [assignedTo], references: [id])
+
+  @@map("escalation_requests")
+}
+
+// Enums for Support System
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  WAITING_AGENT
+  RESOLVED
+  CLOSED
+}
+
+enum SupportPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum SupportChannel {
+  WEB_CHAT
+  EMAIL
+  WHATSAPP
+  PHONE
+  SOCIAL_MEDIA
+}
+
+enum SenderType {
+  CUSTOMER
+  AGENT
+  AI_AGENT
+  SYSTEM
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  AUDIO
+  VIDEO
+  SYSTEM_NOTIFICATION
+}
+
+enum EscalationReason {
+  COMPLEX_ISSUE
+  CUSTOMER_REQUEST
+  AI_LIMITATION
+  TECHNICAL_ISSUE
+  BILLING_DISPUTE
+  COMPLAINT
+  URGENT_MATTER
+}
+
+enum EscalationStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CANCELLED
 } 
