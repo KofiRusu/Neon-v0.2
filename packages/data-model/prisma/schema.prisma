@@ -27,6 +27,8 @@ model User {
   analytics     Analytics[]
   sessions      Session[]
   accounts      Account[]
+  socialPosts   SocialPost[]
+  platformCredentials PlatformCredential[]
 
   @@map("users")
 }
@@ -246,6 +248,54 @@ model DesignTemplate {
   @@map("design_templates")
 }
 
+// Social Media Management
+model SocialPost {
+  id            String        @id @default(cuid())
+  title         String?
+  content       String
+  mediaUrls     String[]
+  platforms     Platform[]
+  status        SocialPostStatus @default(DRAFT)
+  scheduledAt   DateTime?
+  publishedAt   DateTime?
+  engagementData Json?
+  platformPostIds Json?        // Store post IDs from each platform
+  hashtags      String[]
+  mentions      String[]
+  campaignId    String?
+  userId        String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  campaign      Campaign?     @relation(fields: [campaignId], references: [id])
+  user          User          @relation(fields: [userId], references: [id])
+  
+  @@map("social_posts")
+}
+
+model PlatformCredential {
+  id            String        @id @default(cuid())
+  userId        String
+  platform      Platform
+  accountId     String        // Platform-specific account ID
+  accountName   String        // Display name for the account
+  accessToken   String        // Encrypted access token
+  refreshToken  String?       // Encrypted refresh token
+  tokenExpiry   DateTime?
+  isActive      Boolean       @default(true)
+  permissions   String[]      // What permissions we have
+  metadata      Json?         // Platform-specific data
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  user          User          @relation(fields: [userId], references: [id])
+
+  @@unique([userId, platform, accountId])
+  @@map("platform_credentials")
+}
+
 // Enums
 enum UserRole {
   ADMIN
@@ -286,6 +336,15 @@ enum Platform {
   META_ADS
 }
 
+enum SocialPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
 enum AgentType {
   CONTENT
   AD
@@ -293,6 +352,7 @@ enum AgentType {
   TREND
   INSIGHT
   DESIGN
+  SOCIAL
 }
 
 enum AgentStatus {
