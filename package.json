@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -b",
+    "build:apps": "npm run build --workspace=@neonhub/dashboard && npm run build --workspace=@neonhub/api",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
@@ -17,7 +18,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
+    "test:autonomous": "node scripts/autonomous-testing-agent.js",
     "type-check": "tsc --noEmit",
+    "validate:api": "node scripts/api-contract-validator.js",
+    "fine-tune": "node scripts/fine-tuning-master.js",
     "clean": "rm -rf dist coverage .nyc_output",
     "dev": "concurrently \"npm run dev:dashboard\" \"npm run dev:api\"",
     "dev:dashboard": "cd apps/dashboard && npm run dev",
