@@ -14,8 +14,8 @@ import {
   PlusIcon
 } from '@heroicons/react/24/outline';
 
-export default function Dashboard() {
-  const [searchQuery, setSearchQuery] = useState('');
+export default function Dashboard(): JSX.Element {
+  const [searchQuery] = useState('');
 
   const agents = [
     { id: 'content', name: 'Content Agent', status: 'active', icon: DocumentTextIcon, color: 'text-blue-400', description: 'AI-powered content generation' },

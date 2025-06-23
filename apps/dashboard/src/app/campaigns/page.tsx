@@ -10,10 +10,8 @@ import {
   ChartBarIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon,
   PlayIcon,
   PauseIcon,
-  StopIcon,
   FunnelIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
@@ -64,11 +62,11 @@ const statusConfig = {
   cancelled: { name: 'Cancelled', color: 'text-red-400', bg: 'bg-red-500/20', icon: ExclamationTriangleIcon },
 };
 
-export default function CampaignsPage() {
+export default function CampaignsPage(): JSX.Element {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [, setSelectedCampaign] = useState<Campaign | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
