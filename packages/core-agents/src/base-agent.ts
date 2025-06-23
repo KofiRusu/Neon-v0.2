@@ -1,35 +1,14 @@
-import { z } from 'zod';
+import { 
+  AgentPayload, 
+  AgentResult, 
+  AgentStatus, 
+  AgentPayloadSchema,
+  AgentData
+} from './types';
+import { logger } from './logger';
 
-// Base schemas for agent communication
-export const AgentPayloadSchema = z.object({
-  task: z.string(),
-  context: z.record(z.any()).optional(),
-  priority: z.enum(['low', 'medium', 'high', 'critical']).default('medium'),
-  deadline: z.date().optional(),
-  metadata: z.record(z.any()).optional(),
-});
-
-export const AgentResultSchema = z.object({
-  success: z.boolean(),
-  data: z.any().optional(),
-  error: z.string().optional(),
-  performance: z.number().optional(),
-  metadata: z.record(z.any()).optional(),
-});
-
-export const AgentStatusSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: z.string(),
-  status: z.enum(['idle', 'running', 'error', 'maintenance']),
-  lastExecution: z.date().optional(),
-  performance: z.number().optional(),
-  capabilities: z.array(z.string()),
-});
-
-export type AgentPayload = z.infer<typeof AgentPayloadSchema>;
-export type AgentResult = z.infer<typeof AgentResultSchema>;
-export type AgentStatus = z.infer<typeof AgentStatusSchema>;
+// Re-export types for convenience
+export { AgentPayload, AgentResult, AgentStatus, AgentData } from './types';
 
 export interface BaseAgent {
   id: string;
@@ -79,7 +58,12 @@ export abstract class AbstractAgent implements BaseAgent {
       AgentPayloadSchema.parse(payload);
       return true;
     } catch (error) {
-      console.error(`Invalid payload for agent ${this.name}:`, error);
+      logger.error(
+        `Invalid payload for agent ${this.name}`,
+        { error: error instanceof Error ? error.message : String(error) },
+        this.id,
+        this.name
+      );
       return false;
     }
   }
@@ -102,7 +86,7 @@ export abstract class AbstractAgent implements BaseAgent {
 
   protected async executeWithErrorHandling(
     payload: AgentPayload,
-    executionFn: () => Promise<any>
+    executionFn: () => Promise<AgentData>
   ): Promise<AgentResult> {
     const startTime = Date.now();
     
@@ -149,20 +133,23 @@ export abstract class AbstractAgent implements BaseAgent {
   }
 }
 
+// Agent constructor type
+export type AgentConstructor = new (id: string, name: string, ...args: unknown[]) => BaseAgent;
+
 // Agent factory for creating agent instances
 export class AgentFactory {
-  private static agents = new Map<string, new (...args: any[]) => BaseAgent>();
+  private static agents = new Map<string, AgentConstructor>();
 
-  static registerAgent(type: string, agentClass: new (...args: any[]) => BaseAgent): void {
+  static registerAgent(type: string, agentClass: AgentConstructor): void {
     this.agents.set(type, agentClass);
   }
 
-  static createAgent(type: string, id: string, name: string, ...args: any[]): BaseAgent {
+  static createAgent(type: string, id: string, name: string, ...args: unknown[]): BaseAgent {
     const AgentClass = this.agents.get(type);
     if (!AgentClass) {
       throw new Error(`Unknown agent type: ${type}`);
     }
-    return new AgentClass(id, name, type, ...args);
+    return new AgentClass(id, name, ...args);
   }
 
   static getAvailableTypes(): string[] {

@@ -4,14 +4,10 @@ import { useState, useEffect } from 'react';
 import { 
   ChartBarIcon,
   ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
   EyeIcon,
   CurrencyDollarIcon,
-  UserGroupIcon,
-  CalendarIcon,
   ClockIcon,
   DocumentArrowDownIcon,
-  FunnelIcon,
   AdjustmentsHorizontalIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
@@ -189,17 +185,17 @@ export default function AnalyticsPage() {
     }).format(amount);
   };
 
-  const formatNumber = (num: number) => {
+  const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
+      return `${(num / 1000000).toFixed(1)}M`;
     }
     if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
+      return `${(num / 1000).toFixed(1)}K`;
     }
     return num.toLocaleString();
   };
 
-  const formatPercentage = (num: number) => {
+  const formatPercentage = (num: number): string => {
     return `${num > 0 ? '+' : ''}${num.toFixed(1)}%`;
   };
 
