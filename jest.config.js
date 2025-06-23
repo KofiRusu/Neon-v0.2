@@ -3,13 +3,24 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: [
     '<rootDir>/packages/**/__tests__/**/*.test.ts',
-    '<rootDir>/packages/**/?(*.)+(spec|test).ts'
+    '<rootDir>/packages/**/?(*.)+(spec|test).ts',
+    '<rootDir>/apps/**/__tests__/**/*.test.ts',
+    '<rootDir>/apps/**/?(*.)+(spec|test).ts'
+  ],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/dist/'
   ],
   collectCoverageFrom: [
     'packages/**/src/**/*.ts',
+    'apps/**/src/**/*.ts',
     '!packages/**/src/**/*.d.ts',
+    '!apps/**/src/**/*.d.ts',
     '!packages/**/src/**/*.test.ts',
-    '!packages/**/src/**/*.spec.ts'
+    '!apps/**/src/**/*.test.ts',
+    '!packages/**/src/**/*.spec.ts',
+    '!apps/**/src/**/*.spec.ts'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

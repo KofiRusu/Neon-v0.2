@@ -28,7 +28,13 @@
     "db:studio": "cd packages/data-model && npx prisma studio",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "ci": "npm run lint && npm run type-check && npm run test && npm run test:e2e"
+    "ci": "npm run lint && npm run type-check && npm run test && npm run test:e2e",
+    "test:autonomous": "node scripts/autonomous-testing-agent.js",
+    "validate:api": "node scripts/api-contract-validator.js", 
+    "fine-tune": "node scripts/fine-tuning-master.js",
+    "quality:check": "npm run lint && npm run type-check && npm run test:coverage",
+    "quality:fix": "npm run lint:fix && npm run format",
+    "prepare": "npm run db:generate"
   },
   "keywords": [
     "ai",
